@@ -11,6 +11,12 @@ class App extends Component {
     this.state = {
       board: new Board()
     };
+
+    if (this.state.board.nextPlayer === 'blue') {
+      setTimeout(() => {
+        this.iaMove()
+      }, 0)
+    }
   }
 
   handleGameRestart() {
@@ -30,18 +36,25 @@ class App extends Component {
     });
 
     setTimeout(() => {
-      const mM = minMax(this.state.board, 8, -Infinity, Infinity, true, [])
-      if (mM.path.length)
-        this.state.board.addPiece(mM.path[mM.path.length - 1], 'blue')
-      this.setState({
-        board: this.state.board
-      });
+      this.iaMove()
     }, 0)
+  }
+
+  iaMove() {
+    const mM = minMax(this.state.board, 8, -Infinity, Infinity, true, [])
+    if (mM.path.length)
+      this.state.board.addPiece(mM.path[mM.path.length - 1], 'blue')
+    this.setState({
+      board: this.state.board
+    });
   }
 
   render() {
     return (
-      <BoardComponent board={this.state.board} addPiece={this.handleGameAddPiece.bind(this)} />
+      <div>
+        <BoardComponent board={this.state.board} addPiece={this.handleGameAddPiece.bind(this)} />
+        { this.state.board.nextPlayer === 'blue' && <center>Thinking...</center> }
+      </div>
     );
   }
 }

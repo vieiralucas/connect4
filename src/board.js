@@ -14,7 +14,7 @@ class Board {
 
     this.inserts = 0;
 
-    this.nextPlayer = refreshPlayer(this.inserts);
+    this.nextPlayer = Math.random() > 0.5 ? 'red' : 'blue'
 
     this.isActive = true;
   }
@@ -35,7 +35,7 @@ class Board {
 
       this.inserts++;
 
-      this.nextPlayer = refreshPlayer(this.inserts);
+      this.nextPlayer = refreshPlayer(this.nextPlayer);
 
       if (this.didSomebodyWin()) {
         this.isActive = false;
@@ -51,6 +51,7 @@ class Board {
     let humanScore = 0
     let iaScore = 0
 
+    let blank
     for (let i = 0; i < 4; i++) {
         if (x < 0 || x > this.grid.length - 1 || y < 0 || y > this.grid[x].length - 1) {
           break
@@ -62,16 +63,30 @@ class Board {
           iaScore++
         } else if (value === 'red') {
           humanScore++
+        } else {
+          blank++
         }
 
         y += dy
         x += dx
     }
 
-    if (humanScore === 4) {
-      return -10000
-    } else if (iaScore === 4) {
-      return 10000
+    if (iaScore === 4) {
+      return 10000000
+    } else if (humanScore === 4) {
+      return -10000000
+    } else if (iaScore === 3) {
+      return 100000
+    } else if (humanScore === 3) {
+      return -100000
+    } else if (iaScore === 2) {
+      return 1000
+    } else if (humanScore === 2) {
+      return -1000
+    } else if (iaScore === 1) {
+      return 10
+    } else if (humanScore === 1) {
+      return -10
     }
 
     return iaScore
@@ -111,8 +126,12 @@ let availablePlayers = [
   'blue'
 ];
 
-function refreshPlayer(inserts) {
-  return availablePlayers[inserts % 2];
+function refreshPlayer(curr) {
+  if (curr === 'red') {
+    return 'blue'
+  }
+
+  return 'red'
 }
 
 export default Board
