@@ -47,76 +47,113 @@ class Board {
     return matches(this.grid);
   }
 
-  scorePoint(x, y, dx, dy) {
-    let humanScore = 0
-    let iaScore = 0
-
-    let blank
-    for (let i = 0; i < 4; i++) {
-        if (x < 0 || x > this.grid.length - 1 || y < 0 || y > this.grid[x].length - 1) {
+  score() {
+    const horizontal = (x, y) => {
+      const pos = this.grid[x][y]
+      const previous = (this.grid[x - 1] || [])[y]
+      let friends = 0
+      for (let i = 0; i < 4; i++) {
+        const curr = (this.grid[x + i] || [])[y]
+        if (curr === pos) {
+          friends++
+        } else if (curr !== 0) {
+          // enemy found, this is useless
           break
         }
+      }
 
-        const value = this.grid[x][y]
+      if (friends === 3) {
+        return previous === 0 ? 10000 : 100
+      } else if (friends === 4) {
+        return 100000
+      }
 
-        if (value === 'blue') {
-          iaScore++
-        } else if (value === 'red') {
-          humanScore++
-        } else {
-          blank++
+      return 0
+    }
+
+    const vertical = (x, y) => {
+      const pos = this.grid[x][y]
+      const previous = this.grid[x][y - 1]
+      let friends = 0
+      for (let i = 0; i < 4; i++) {
+        const curr = this.grid[x][y + i]
+        if (curr === pos) {
+          friends++
+        } else if (curr !== 0) {
+          // enemy found, this is useless
+          break
         }
+      }
 
-        y += dy
-        x += dx
+      if (friends === 3) {
+        return previous === 0 ? 10000 : 100
+      } else if (friends === 4) {
+        return 100000
+      }
+
+      return 0
     }
 
-    if (iaScore === 4) {
-      return 10000000
-    } else if (humanScore === 4) {
-      return -10000000
-    } else if (iaScore === 3) {
-      return 100000
-    } else if (humanScore === 3) {
-      return -100000
-    } else if (iaScore === 2) {
-      return 1000
-    } else if (humanScore === 2) {
-      return -1000
-    } else if (iaScore === 1) {
-      return 10
-    } else if (humanScore === 1) {
-      return -10
+    const diag1 = (x, y) => {
+      const pos = this.grid[x][y]
+      const previous = (this.grid[x - 1] || [])[y - 1]
+      let friends = 0
+      for (let i = 0; i < 4; i++) {
+        const curr = (this.grid[x - i] || [])[y + i]
+        if (curr === pos) {
+          friends++
+        } else if (curr !== 0) {
+          // enemy found, this is useless
+          break
+        }
+      }
+
+      if (friends === 3) {
+        return previous === 0 ? 10000 : 100
+      } else if (friends === 4) {
+        return 100000
+      }
+
+      return 0
     }
 
-    return iaScore
-  }
+    const diag2 = (x, y) => {
+      const pos = this.grid[x][y]
+      const previous = (this.grid[x + 1] || [])[y - 1]
+      let friends = 0
+      for (let i = 0; i < 4; i++) {
+        const curr = (this.grid[x + i] || [])[y + i]
+        if (curr === pos) {
+          friends++
+        } else if (curr !== 0) {
+          // enemy found, this is useless
+          break
+        }
+      }
 
-  score() {
+      if (friends === 3) {
+        return previous === 0 ? 10000 : 100
+      } else if (friends === 4) {
+        return 100000
+      }
+
+      return 0
+    }
+
     let score = 0
     for (let x = 0; x < this.grid.length; x++) {
       for (let y = 0; y < this.grid[x].length; y++) {
-        const verticalScore = this.scorePoint(x, y, 0, 1)
-        if (Math.abs(verticalScore) === 10000)
-          return verticalScore
+        const pos = this.grid[x][y]
 
-        const horizontalScore = this.scorePoint(x, y, 1, 0)
-        if (Math.abs(horizontalScore) === 10000)
-          return verticalScore
+        if (pos === 0) {
+          continue
+        }
 
-        const diag1Score = this.scorePoint(x, y, 1, 1)
-        if (Math.abs(diag1Score) === 10000)
-          return verticalScore
-
-        const diag2Score = this.scorePoint(x, y, -1, 1)
-        if (Math.abs(diag2Score) === 10000)
-          return verticalScore
-
-        score += verticalScore + horizontalScore + diag1Score + diag2Score
+        score += (horizontal(x, y) + vertical(x, y) + diag1(x, y) + diag2(x, y)) * (pos === 'blue' ? 1 : -1)
       }
     }
 
-    return score
+    return score / (this.inserts || 1)
   }
 }
 

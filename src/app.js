@@ -43,7 +43,7 @@ class App extends Component {
   iaMove() {
     const mM = minMax(this.state.board, 8, -Infinity, Infinity, true, [])
     if (mM.path.length)
-      this.state.board.addPiece(mM.path[mM.path.length - 1], 'blue')
+      this.state.board.addPiece(mM.path[0], 'blue')
     this.setState({
       board: this.state.board
     });
@@ -76,7 +76,7 @@ function minMax(node, depth, alpha, beta, maximizing, path) {
     for (let i = 0; i < moves.length; i++) {
       const column = moves[i]
       const child = executeMove(node, column, 'blue')
-      const mM = minMax(child, depth - 1, alpha, beta, false, [...path, column])
+      const mM = minMax(child, depth - 1, alpha, beta, false, [column, ...path])
       newPath = mM.path
       v = Math.max(v, mM.v)
       alpha = Math.max(alpha, v)
@@ -89,7 +89,7 @@ function minMax(node, depth, alpha, beta, maximizing, path) {
     for (let i = 0; i < moves.length; i++) {
       const column = moves[i]
       const child = executeMove(node, column, 'red')
-      const mM = minMax(child, depth - 1, alpha, beta, true, [...path, column])
+      const mM = minMax(child, depth - 1, alpha, beta, true, [column, ...path])
       newPath = mM.path
       v = Math.min(v, mM.v)
       beta = Math.min(beta, v)
