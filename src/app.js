@@ -30,7 +30,7 @@ class App extends Component {
     });
 
     setTimeout(() => {
-      const mM = minMax(this.state.board, 3, -Infinity, Infinity, true, [])
+      const mM = minMax(this.state.board, 8, -Infinity, Infinity, true, [])
       if (mM.path.length)
         this.state.board.addPiece(mM.path[mM.path.length - 1], 'blue')
       this.setState({
