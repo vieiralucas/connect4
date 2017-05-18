@@ -1,5 +1,3 @@
-import matches from './matches';
-
 class Board {
   constructor() {
     this.grid = [
@@ -10,41 +8,76 @@ class Board {
       [ 0, 0, 0, 0, 0, 0 ],
       [ 0, 0, 0, 0, 0, 0 ],
       [ 0, 0, 0, 0, 0, 0 ]
-    ];
+    ]
 
-    this.inserts = 0;
+    this.inserts = 0
 
     this.nextPlayer = Math.random() > 0.5 ? 'red' : 'blue'
 
-    this.isActive = true;
+    this.isActive = true
   }
 
 
   addPiece(columnIndex, piece) {
-    let column = this.grid[columnIndex];
-    let cellIndex = -1;
+    let column = this.grid[columnIndex]
+    let cellIndex = -1
 
     column.forEach((columnPiece, i) => {
       if (columnPiece === 0) {
-        cellIndex = i;
+        cellIndex = i
       }
-    });
+    })
 
     if (cellIndex >= 0) {
-      column[cellIndex] = piece;
+      column[cellIndex] = piece
 
-      this.inserts++;
+      this.inserts++
 
-      this.nextPlayer = refreshPlayer(this.nextPlayer);
+      this.nextPlayer = nextPlayer(this.nextPlayer)
 
-      if (this.didSomebodyWin()) {
-        this.isActive = false;
+      if (this.isOver()) {
+        this.isActive = false
       }
     }
   }
 
-  didSomebodyWin() {
-    return matches(this.grid);
+  isOver() {
+    const walk = (x, y, dx, dy) => {
+      const curr = this.grid[x][y]
+
+      if (curr === 0) {
+        return false
+      }
+
+      for (let i = 1; i < 4; i++) {
+        const next = (this.grid[x + (i * dx)] || [])[y + (i * dy)]
+
+        if (next !== curr) {
+          return false
+        }
+      }
+
+      return true
+    }
+
+    for (let x = 0; x < this.grid.length; x++) {
+      for (let y = 0; y < this.grid[x].length; y++) {
+        const left = () => walk(x, y, -1, 0)
+        const right = () => walk(x, y, 1, 0)
+        const up = () => walk(x, y, 0, -1)
+        const down = () => walk(x, y, 0, -1)
+        const diagUpLeft = () => walk(x, y, -1, -1)
+        const diagUpRight = () => walk(x, y, 1, -1)
+        const diagDownLeft = () => walk(x, y, -1, 1)
+        const diagDownRight = () => walk(x, y, 1, 1)
+
+        if (left() || right() || up() || down() || diagUpLeft() || diagUpRight() || diagDownLeft() || diagDownRight()) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   score() {
@@ -158,12 +191,7 @@ class Board {
 }
 
 
-let availablePlayers = [
-  'red',
-  'blue'
-];
-
-function refreshPlayer(curr) {
+function nextPlayer(curr) {
   if (curr === 'red') {
     return 'blue'
   }

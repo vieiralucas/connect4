@@ -41,7 +41,7 @@ class App extends Component {
   }
 
   iaMove() {
-    const mM = minMax(this.state.board, 8, -Infinity, Infinity, true, [])
+    const mM = minMax(this.state.board, 5, -Infinity, Infinity, true, [])
     if (mM.path.length)
       this.state.board.addPiece(mM.path[0], 'blue')
     this.setState({
@@ -60,7 +60,7 @@ class App extends Component {
 }
 
 function minMax(node, depth, alpha, beta, maximizing, path) {
-  if (depth === 0 || node.didSomebodyWin()) {
+  if (depth === 0 || node.isOver()) {
     return {
       v: node.score(),
       path
